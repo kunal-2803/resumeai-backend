@@ -6,6 +6,8 @@ import { connectDB } from './utils/db';
 // Load environment variables
 dotenv.config();
 
+//add a test commet
+
 const app: Application = express();
 
 // Connect to MongoDB
