@@ -6,7 +6,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface IOpenAIUsage extends Document {
   userId: mongoose.Types.ObjectId;
   operation: string; // e.g., 'parseResume', 'generateResume', 'improveSection', 'calculateATSScore'
-  model: string; // e.g., 'gpt-4o-mini', 'gpt-4'
+  modelName: string; // e.g., 'gpt-4o-mini', 'gpt-4'
   promptTokens: number;
   completionTokens: number;
   totalTokens: number;
@@ -38,7 +38,7 @@ const openAIUsageSchema = new Schema<IOpenAIUsage>(
       required: [true, 'Operation type is required'],
       index: true,
     },
-    model: {
+    modelName: {
       type: String,
       required: [true, 'Model name is required'],
       index: true,
@@ -83,7 +83,7 @@ const openAIUsageSchema = new Schema<IOpenAIUsage>(
 openAIUsageSchema.index({ userId: 1, createdAt: -1 });
 openAIUsageSchema.index({ userId: 1, operation: 1 });
 openAIUsageSchema.index({ createdAt: -1 });
-openAIUsageSchema.index({ model: 1 });
+openAIUsageSchema.index({ modelName: 1 });
 
 /**
  * OpenAI usage model

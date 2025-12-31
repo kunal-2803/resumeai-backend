@@ -147,7 +147,7 @@ class SubscriptionService {
    */
   async canCreateResume(userId: string): Promise<{ allowed: boolean; message?: string }> {
     const subscription = await this.getOrCreateSubscription(userId);
-    const plan = subscription.planId as IPlan;
+    const plan = subscription.planId as unknown as IPlan;
 
     if (subscription.left.resumes <= 0) {
       return {
@@ -164,7 +164,7 @@ class SubscriptionService {
    */
   async canRunATSCheck(userId: string): Promise<{ allowed: boolean; message?: string }> {
     const subscription = await this.getOrCreateSubscription(userId);
-    const plan = subscription.planId as IPlan;
+    const plan = subscription.planId as unknown as IPlan;
 
     if (subscription.left.atsChecks <= 0) {
       return {

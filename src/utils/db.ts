@@ -2,23 +2,13 @@ import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/resume-ai';
 
-interface ConnectionOptions {
-  useNewUrlParser?: boolean;
-  useUnifiedTopology?: boolean;
-}
-
 /**
  * Connect to MongoDB using mongoose
  * @returns Promise<void>
  */
 export const connectDB = async (): Promise<void> => {
   try {
-    const options: ConnectionOptions = {
-      // Note: useNewUrlParser and useUnifiedTopology are deprecated in mongoose 6+
-      // but kept for compatibility if needed
-    };
-
-    await mongoose.connect(MONGODB_URI, options);
+    await mongoose.connect(MONGODB_URI);
 
     console.log('✅ MongoDB connected successfully');
   } catch (error) {

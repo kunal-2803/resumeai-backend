@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import { Admin, User, UserSubscription, Plan, PlanType, OpenAIUsage, Resume } from '../models';
 import { AdminAuthRequest } from '../middleware/adminAuth';
 import subscriptionService from '../services/subscriptionService';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+const JWT_SECRET: string = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_EXPIRES_IN: string = process.env.JWT_EXPIRES_IN || '7d';
 
 /**
  * Admin login
@@ -42,9 +42,11 @@ export const adminLogin = async (req: Request, res: Response) => {
     }
 
     // Generate JWT
-    const token = jwt.sign({ adminId: admin._id.toString(), role: 'admin' }, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN,
-    });
+    const token = jwt.sign(
+      { adminId: admin._id.toString(), role: 'admin' },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN } as SignOptions
+    );
 
     res.json({
       success: true,

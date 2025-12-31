@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { User } from '../models';
 import subscriptionService from '../services/subscriptionService';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+const JWT_SECRET: string = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_EXPIRES_IN: string = process.env.JWT_EXPIRES_IN || '7d';
 
 /**
  * Register a new user
@@ -57,9 +57,11 @@ export const register = async (req: Request, res: Response) => {
     }
 
     // Generate JWT
-    const token = jwt.sign({ userId: user._id.toString() }, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN,
-    });
+    const token = jwt.sign(
+      { userId: user._id.toString() },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN } as SignOptions
+    );
 
     res.status(201).json({
       success: true,
@@ -112,9 +114,11 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Generate JWT
-    const token = jwt.sign({ userId: user._id.toString() }, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN,
-    });
+    const token = jwt.sign(
+      { userId: user._id.toString() },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN } as SignOptions
+    );
 
     res.json({
       success: true,

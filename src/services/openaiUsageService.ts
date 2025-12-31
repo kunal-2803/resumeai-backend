@@ -29,7 +29,7 @@ class OpenAIUsageService {
     const usage = new OpenAIUsage({
       userId: new mongoose.Types.ObjectId(userId),
       operation,
-      model,
+      modelName: model,
       promptTokens,
       completionTokens,
       totalTokens,
@@ -111,7 +111,7 @@ class OpenAIUsageService {
 
     usage.forEach((u) => {
       operationCounts[u.operation] = (operationCounts[u.operation] || 0) + 1;
-      modelCounts[u.model] = (modelCounts[u.model] || 0) + 1;
+      modelCounts[u.modelName] = (modelCounts[u.modelName] || 0) + 1;
     });
 
     return {
@@ -157,7 +157,7 @@ class OpenAIUsageService {
 
     usage.forEach((u) => {
       operationCounts[u.operation] = (operationCounts[u.operation] || 0) + 1;
-      modelCounts[u.model] = (modelCounts[u.model] || 0) + 1;
+      modelCounts[u.modelName] = (modelCounts[u.modelName] || 0) + 1;
     });
 
     return {
