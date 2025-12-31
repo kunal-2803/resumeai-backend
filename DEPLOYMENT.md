@@ -8,6 +8,7 @@ This guide explains how to deploy the backend to EC2 using Docker and CI/CD.
 2. Docker Hub account (or GitHub Container Registry)
 3. GitHub repository with Actions enabled
 4. SSH access to your EC2 instance
+5. MongoDB (can be run via Docker - see MONGODB_DOCKER.md)
 
 ## Initial EC2 Setup
 
@@ -84,10 +85,12 @@ Add your environment variables:
 ```
 PORT=3000
 NODE_ENV=production
-MONGODB_URI=your_mongodb_connection_string
+MONGODB_URI=mongodb://mongodb:27017/resume-ai
 JWT_SECRET=your_jwt_secret
 # Add all other required environment variables
 ```
+
+**Note:** If using Docker Compose, MongoDB will be available at `mongodb://mongodb:27017/resume-ai`. For external MongoDB, use your connection string.
 
 ### 3. Set Up SSH Key for GitHub Actions
 
@@ -160,11 +163,14 @@ chmod +x deploy.sh
 ./deploy.sh
 ```
 
-Or use docker-compose:
+Or use docker-compose (includes MongoDB):
 ```bash
-docker-compose pull
-docker-compose up -d
+# Copy docker-compose.prod.yml to EC2
+docker-compose -f docker-compose.prod.yml pull
+docker-compose -f docker-compose.prod.yml up -d
 ```
+
+This will start both MongoDB and the backend. See `MONGODB_DOCKER.md` for MongoDB-specific instructions.
 
 ## Testing Locally
 

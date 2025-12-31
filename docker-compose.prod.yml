@@ -4,8 +4,6 @@ services:
   mongodb:
     image: mongo:7.0
     container_name: resume-ai-mongodb
-    ports:
-      - "27017:27017"
     environment:
       - MONGO_INITDB_DATABASE=resume-ai
     volumes:
@@ -20,11 +18,12 @@ services:
       timeout: 5s
       retries: 5
       start_period: 40s
+    # Don't expose port 27017 externally in production (only accessible within Docker network)
+    # ports:
+    #   - "27017:27017"
 
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: kunal2803/resume-ai-backend:latest
     container_name: resume-ai-backend
     ports:
       - "3000:3000"

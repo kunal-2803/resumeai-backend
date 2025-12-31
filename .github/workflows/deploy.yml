@@ -58,15 +58,55 @@ jobs:
           port: ${{ secrets.EC2_PORT || 22 }}
           script: |
             cd ~/resume-ai-backend || mkdir -p ~/resume-ai-backend && cd ~/resume-ai-backend
+            
+            # Pull latest backend image
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            docker stop resume-ai-backend || true
-            docker rm resume-ai-backend || true
-            docker run -d \
-              --name resume-ai-backend \
-              --restart unless-stopped \
-              -p 3000:3000 \
-              --env-file .env \
-              ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            
+            # Check if docker-compose.prod.yml exists (should be in repo)
+            if [ -f docker-compose.prod.yml ]; then
+              echo "Using docker-compose for deployment..."
+              # Update .env to use Docker MongoDB if not already set
+              if [ -f .env ] && ! grep -q "MONGODB_URI=mongodb://mongodb" .env; then
+                sed -i 's|MONGODB_URI=.*|MONGODB_URI=mongodb://mongodb:27017/resume-ai|g' .env || echo "MONGODB_URI=mongodb://mongodb:27017/resume-ai" >> .env
+              fi
+              docker-compose -f docker-compose.prod.yml pull
+              docker-compose -f docker-compose.prod.yml up -d
+            else
+              echo "docker-compose.prod.yml not found, using docker run instead"
+              # Create network if it doesn't exist
+              docker network create resume-ai-network 2>/dev/null || true
+              
+              # Stop existing containers
+              docker stop resume-ai-backend resume-ai-mongodb 2>/dev/null || true
+              docker rm resume-ai-backend resume-ai-mongodb 2>/dev/null || true
+              
+              # Start MongoDB if not running
+              if ! docker ps | grep -q resume-ai-mongodb; then
+                docker run -d \
+                  --name resume-ai-mongodb \
+                  --restart unless-stopped \
+                  --network resume-ai-network \
+                  -v mongodb_data:/data/db \
+                  -v mongodb_config:/data/configdb \
+                  mongo:7.0
+              fi
+              
+              # Update .env to use Docker MongoDB
+              if [ -f .env ]; then
+                sed -i 's|MONGODB_URI=.*|MONGODB_URI=mongodb://mongodb:27017/resume-ai|g' .env || echo "MONGODB_URI=mongodb://mongodb:27017/resume-ai" >> .env
+              fi
+              
+              # Start backend
+              docker run -d \
+                --name resume-ai-backend \
+                --restart unless-stopped \
+                -p 3000:3000 \
+                --env-file .env \
+                --network resume-ai-network \
+                -e MONGODB_URI=mongodb://mongodb:27017/resume-ai \
+                ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            fi
+            
             docker system prune -af --volumes
 
