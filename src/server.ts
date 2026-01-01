@@ -1,9 +1,11 @@
 import app from './app';
 
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0'; // Explicitly bind to all interfaces
 
-const server = app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+const port = typeof PORT === "string" ? parseInt(PORT, 10) : PORT;
+const server = app.listen(port, HOST, () => {
+  console.log(`Server is running on http://${HOST}:${port}`);
 });
 
 // Graceful shutdown
