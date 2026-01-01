@@ -70,8 +70,21 @@ jobs:
               if [ -f .env ] && ! grep -q "MONGODB_URI=mongodb://mongodb" .env; then
                 sed -i 's|MONGODB_URI=.*|MONGODB_URI=mongodb://mongodb:27017/resume-ai|g' .env || echo "MONGODB_URI=mongodb://mongodb:27017/resume-ai" >> .env
               fi
+              
+              # Stop and remove existing containers to avoid conflicts
+              docker-compose -f docker-compose.prod.yml down 2>/dev/null || true
+              docker stop resume-ai-backend resume-ai-mongodb 2>/dev/null || true
+              docker rm resume-ai-backend resume-ai-mongodb 2>/dev/null || true
+              
+              # Pull latest images
               docker-compose -f docker-compose.prod.yml pull
+              
+              # Start services
               docker-compose -f docker-compose.prod.yml up -d
+              
+              # Verify containers are running
+              sleep 5
+              docker-compose -f docker-compose.prod.yml ps
             else
               echo "docker-compose.prod.yml not found, using docker run instead"
               # Create network if it doesn't exist
@@ -108,5 +121,6 @@ jobs:
                 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             fi
             
-            docker system prune -af --volumes
+            # Clean up unused images (but keep the ones we just pulled)
+            docker image prune -f
 
