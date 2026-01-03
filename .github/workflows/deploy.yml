@@ -68,7 +68,7 @@ jobs:
               echo "Using docker-compose for deployment..."
               # Update .env to use Docker MongoDB if not already set
               if [ -f .env ] && ! grep -q "MONGODB_URI=mongodb://mongodb" .env; then
-                sed -i 's|MONGODB_URI=.*|MONGODB_URI=mongodb://mongodb:27017/resume-ai|g' .env || echo "MONGODB_URI=mongodb://mongodb:27017/resume-ai" >> .env
+                sed -i 's|MONGODB_URI=.*|MONGODB_URI=mongodb://resume-ai-mongodb:27017/resume-ai|g' .env || echo "MONGODB_URI=mongodb://resume-ai-mongodb:27017/resume-ai" >> .env
               fi
               
               # Stop and remove existing containers to avoid conflicts
@@ -107,7 +107,7 @@ jobs:
               
               # Update .env to use Docker MongoDB
               if [ -f .env ]; then
-                sed -i 's|MONGODB_URI=.*|MONGODB_URI=mongodb://mongodb:27017/resume-ai|g' .env || echo "MONGODB_URI=mongodb://mongodb:27017/resume-ai" >> .env
+                sed -i 's|MONGODB_URI=.*|MONGODB_URI=mongodb://resume-ai-mongodb:27017/resume-ai|g' .env || echo "MONGODB_URI=mongodb://resume-ai-mongodb:27017/resume-ai" >> .env
               fi
               
               # Start backend
@@ -117,7 +117,7 @@ jobs:
                 -p 3000:3000 \
                 --env-file .env \
                 --network resume-ai-network \
-                -e MONGODB_URI=mongodb://mongodb:27017/resume-ai \
+                -e MONGODB_URI=mongodb://resume-ai-mongodb:27017/resume-ai \
                 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             fi
             
