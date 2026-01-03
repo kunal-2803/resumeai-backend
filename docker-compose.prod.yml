@@ -19,8 +19,8 @@ services:
       retries: 5
       start_period: 40s
     # Don't expose port 27017 externally in production (only accessible within Docker network)
-    # ports:
-    #   - "27017:27017"
+    ports:
+      - "27017:27017"
 
   backend:
     image: kunal2803/resume-ai-backend:latest
